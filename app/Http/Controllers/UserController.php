@@ -40,7 +40,9 @@ class UserController extends Controller
       $query->where('role_id', $request->query('role_id'));
     }
 
-    $users = $query->orderBy('first_name')->get();
+    $perPage = $request->query('per_page', 10);
+
+    $users = $query->orderBy('first_name')->paginate($perPage);
 
     return response()->json($users);
   }
@@ -51,6 +53,7 @@ class UserController extends Controller
    */
   public function store(Request $request)
   {
+    error_log(json_encode($request->all()));
     $validator = Validator::make($request->all(), [
       'first_name' => 'required|string|max:255',
       'last_name' => 'required|string|max:255',
@@ -58,7 +61,7 @@ class UserController extends Controller
       'dpi' => 'required|string|max:20|unique:users,dpi',
       'phone' => 'required|string|max:20',
       'address' => 'required|string|max:255',
-      'password' => 'required|string|min:8|confirmed',
+      'password' => 'required|string|min:8',
       'role_id' => 'required|exists:roles,id',
     ]);
 
@@ -69,19 +72,29 @@ class UserController extends Controller
       ], 422);
     }
 
-    $user = User::create([
-      'first_name' => $request->input('first_name'),
-      'last_name' => $request->input('last_name'),
-      'email' => $request->input('email'),
-      'dpi' => $request->input('dpi'),
-      'phone' => $request->input('phone'),
-      'address' => $request->input('address'),
-      'password' => bcrypt($request->input('password')),
-      'role_id' => $request->input('role_id'),
-    ]);
+    try {
+      // Attempt to create the user
+      $user = User::create([
+        'first_name' => $request->first_name,
+        'last_name' => $request->last_name,
+        'email' => $request->email,
+        'dpi' => $request->dpi,
+        'phone' => $request->phone,
+        'address' => $request->address,
+        'password' => bcrypt($request->password),
+        'role_id' => $request->role_id,
+      ]);
 
-
-    return response()->json($user, 201);
+      // Return the created user with a 201 status code
+      return response()->json($user, 201); // 201 Created
+    } catch (\Exception $e) {
+      // Handle database errors (e.g., unique constraint violation)
+      error_log("Error creating user: " . $e->getMessage()); // Log the error
+      return response()->json([
+        'message' => 'Failed to create user.',
+        'error' => $e->getMessage(), // Optionally include the error message
+      ], 500); // Use 500 for server errors
+    }
   }
 
   /**
@@ -93,6 +106,40 @@ class UserController extends Controller
    * Show the form for editing the specified resource.
    */
   public function edit(User $user) {}
+
+  /**
+   * Update the specified user password.
+   */
+  public function updatePassword(Request $request)
+  {
+    $user = auth('api')->user();
+    $dbUser = User::find($user->id);
+    
+    if (!$dbUser) {
+      return response()->json([
+        'message' => 'Usuario no encontrado',
+      ], 404);
+    }
+    
+    $validator = Validator::make($request->all(), [
+      'new_password' => 'required|string|min:8|confirmed',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'Error de validación',
+        'errors' => $validator->errors(),
+      ], 422);
+    }
+
+    $dbUser->password = bcrypt($request->new_password);
+    $dbUser->save();
+
+    return response()->json([
+      'message' => 'Contraseña actualizada correctamente',
+      'user' => $dbUser,
+    ]);
+  }
 
   /**
    * Update the specified resource in storage.

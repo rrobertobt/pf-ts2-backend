@@ -25,6 +25,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::get('/users', 'index');
         Route::get('/users/{user_id}', 'show');
         Route::post('/users', 'store');
+        Route::put('/users/password', 'updatePassword');
         Route::delete('/users/{user_id}', 'destroy');
     });
 });
