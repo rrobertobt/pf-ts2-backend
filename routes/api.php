@@ -69,7 +69,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::get('/payments', 'index');
     Route::post('/payments', 'store');
     Route::get('/payments/{payment_id}', 'show');
-    Route::put('/payments/{payment_id}', 'update');
+    Route::post('/payments/{payment_id}/upload', 'registerPay');
     Route::delete('/payments/{payment_id}', 'destroy');
   });
 });

@@ -15,8 +15,8 @@ class Payment extends Model
     'correlative',
   ];
 
-  // public function contract()
-  // {
-  //   return $this->belongsTo(Contract::class, 'contract_id');
-  // }
+  public function contract()
+  {
+    return $this->belongsTo(Contract::class, 'contract_id');
+  }
 }
