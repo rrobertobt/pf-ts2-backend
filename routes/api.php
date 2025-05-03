@@ -6,6 +6,7 @@ use App\Http\Controllers\GenderController;
 use App\Http\Controllers\NichesController;
 use App\Http\Controllers\OccupantsController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsUserAuth;
@@ -72,4 +73,15 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::post('/payments/{payment_id}/upload', 'registerPay');
     Route::delete('/payments/{payment_id}', 'destroy');
   });
+
+  // Report routes
+  Route::controller(ReportsController::class)->group(function () {
+    Route::get('/reports', 'index');
+    Route::get('/reports/niches', 'niches');
+    Route::get('/reports/occupants', 'occupants');
+    Route::get('/reports/contracts', 'contracts');
+    Route::get('/reports/payments', 'payments');
+  });
+
+  // todo: exhumation routes, consult routes
 });
