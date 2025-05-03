@@ -32,6 +32,10 @@ class AuthController extends Controller
       $user = JWTAuth::user();
       // get the user's role data too
       $user = User::with('role')->find($user->id);
+      // check if the user is active
+      if (!$user->is_active) {
+        return response()->json(['message' => 'Usuario inactivo'], 401);
+      }
       // remove password and remember_token from the user object
       unset($user->password);
       unset($user->remember_token);

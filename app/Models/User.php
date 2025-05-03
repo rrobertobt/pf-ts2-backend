@@ -77,4 +77,9 @@ class User extends Authenticatable implements JWTSubject
       'password' => 'hashed',
     ];
   }
+
+  public function contracts()
+  {
+    return $this->hasMany(Contract::class, 'representative_user_id');
+  }
 }

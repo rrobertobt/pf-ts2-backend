@@ -63,6 +63,8 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::get('/contracts/{contract_id}', 'show');
     Route::put('/contracts/{contract_id}', 'update');
     Route::delete('/contracts/{contract_id}', 'destroy');
+
+    Route::get('/me/contracts', 'myContracts');
   });
 
   // Payment routes

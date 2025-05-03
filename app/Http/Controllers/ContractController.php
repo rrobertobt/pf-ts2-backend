@@ -6,6 +6,7 @@ use App\Models\Contract;
 use App\Models\ContractState;
 use App\Models\NicheState;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ContractController extends Controller
 {
@@ -54,7 +55,16 @@ class ContractController extends Controller
     //
   }
 
+  public function myContracts(Request $request)
+  {
+    $user = Auth::user();
+    $user_id = $user->id;
 
+    $query = Contract::with(['occupant', 'niche', 'representative', 'state'])
+      ->where('representative_user_id', $user_id);
+
+    return response()->json($query->get());
+  }
   /**
    * Get the states of the contract
    */
@@ -106,7 +116,6 @@ class ContractController extends Controller
     }
     // Save the contract
     $contract->save();
-
   }
 
   /**
