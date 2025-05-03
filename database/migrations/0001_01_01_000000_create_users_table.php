@@ -43,12 +43,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('representatives', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->text('observations')->nullable();
-        });
-
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');

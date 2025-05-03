@@ -28,4 +28,9 @@ class Niche extends Model
     {
         return $this->belongsTo(NichesType::class);
     }
+
+    public function occupant()
+    {
+        return $this->hasOne(Occupant::class, 'current_niche_id');
+    }
 }

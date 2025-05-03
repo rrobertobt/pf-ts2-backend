@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ContractState;
 use App\Models\NicheState;
 use App\Models\NichesType;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -45,6 +46,30 @@ class NicheSeeder extends Seeder
                 'slug' => 'infante',
                 'description' => 'Nicho para infante',
             ]
+        ]);
+
+        // Contract states
+        ContractState::insert([
+            [
+                'name' => 'Pendiente',
+                'slug' => 'pendiente',
+                'description' => 'Pendiente',
+            ],
+            [
+                'name' => 'Vigente',
+                'slug' => 'vigente',
+                'description' => 'Vigente',
+            ],
+            [
+                'name' => 'Vencido',
+                'slug' => 'vencido',
+                'description' => 'Vencido',
+            ],
+            [
+                'name' => 'Rechazado',
+                'slug' => 'rechazado',
+                'description' => 'Rechazado',
+            ],
         ]);
     }
 }

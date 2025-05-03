@@ -40,6 +40,14 @@ class UserController extends Controller
       $query->where('role_id', $request->query('role_id'));
     }
 
+    // only regular users flag
+    if ($request->has('is_regular')) {
+      $query->whereHas('role', function ($q) {
+        $q->where('slug', 'regular');
+      });
+    }
+
+
     $perPage = $request->query('per_page', 10);
 
     $users = $query->orderBy('first_name')->paginate($perPage);

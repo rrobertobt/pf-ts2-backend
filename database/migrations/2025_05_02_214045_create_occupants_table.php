@@ -19,13 +19,21 @@ return new class extends Migration
       $table->string('last_name');
       $table->date('date_of_birth');
       $table->string('birth_location')->nullable();
-      $table->string('dpi')->unique();
+      $table->string('dpi')->unique()->nullable();
       $table->date('death_date');
       $table->string('death_location')->nullable();
       $table->text('death_cause')->nullable();
       $table->text('observations')->nullable();
       $table->foreignId('gender_id')->constrained('genders')->onDelete('cascade');
       $table->foreignId('current_niche_id')->constrained('niches')->onDelete('cascade');
+    });
+
+    Schema::create('contract_states', function (Blueprint $table) {
+      $table->id();
+      $table->timestamps();
+      $table->string('name');
+      $table->string('slug')->unique();
+      $table->text('description')->nullable();
     });
 
     Schema::create('contracts', function (Blueprint $table) {
@@ -36,14 +44,14 @@ return new class extends Migration
       $table->decimal('price', 10, 2);
       $table->foreignId('occupant_id')->constrained('occupants')->onDelete('cascade');
       $table->foreignId('niche_id')->constrained('niches')->onDelete('cascade');
-      $table->foreignId('representative_id')->constrained('representatives')->onDelete('cascade');
-      $table->boolean('active')->default(true);
+      $table->foreignId('representative_user_id')->nullable()->constrained('users')->onDelete('cascade');
+      $table->foreignId('state_id')->constrained('contract_states')->onDelete('cascade');
     });
     Schema::create('representative_occupant', function (Blueprint $table) {
       $table->id();
       $table->timestamps();
       $table->foreignId('occupant_id')->constrained('occupants')->onDelete('cascade');
-      $table->foreignId('representative_id')->constrained('representatives')->onDelete('cascade');
+      $table->foreignId('representative_user_id')->constrained('users')->onDelete('cascade');
       $table->string('relationship')->nullable();
     });
 

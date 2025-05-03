@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Contract;
+use App\Models\ContractState;
 use App\Models\Niche;
 use App\Models\NicheState;
 use App\Models\Occupant;
@@ -59,6 +61,7 @@ class OccupantsController extends Controller
       'observations' => 'nullable|string|max:255',
       'gender_id' => 'required|exists:genders,id',
       'current_niche_id' => 'required|exists:niches,id',
+      'representative_user_id' => 'required|exists:users,id',
     ]);
 
     if ($validator->fails()) {
@@ -81,12 +84,23 @@ class OccupantsController extends Controller
           'message' => 'El nicho no está disponible',
         ], 422);
       }
-      // set the state_id to 'ocupado'
       $niche->state_id = NicheState::where('slug', 'ocupado')->first()->id;
       $niche->save();
-      // create the occupant
-      
+    
       $occupant = Occupant::create($request->all());
+
+      $contractState = ContractState::where('slug', 'pendiente')->first();
+      $contract = Contract::create([
+        'start_date' => now(),
+        'end_date' => now()->addYears(6),
+        'price' => 600.00,
+        'occupant_id' => $occupant->id,
+        'niche_id' => $niche->id,
+        'representative_user_id' => $request->representative_user_id,
+        'state_id' => $contractState->id,
+      ]);
+      error_log('Contract created: ' . $contract);
+
       return response()->json($occupant, 201);
     } catch (\Exception $e) {
       return response()->json([
