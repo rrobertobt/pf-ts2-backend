@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GenderController;
 use App\Http\Controllers\NichesController;
+use App\Http\Controllers\OccupantsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsUserAuth;
@@ -42,5 +43,13 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::post('/niches', 'store');
     Route::get('/niches/states', 'states');
     Route::get('/niches/types', 'types');
+  });
+
+  // Occupants routes
+  Route::controller(OccupantsController::class)->group(function () {
+    Route::get('/occupants', 'index');
+    Route::post('/occupants', 'store');
+    Route::get('/occupants/{occupant_id}', 'show');
+    Route::delete('/occupants/{occupant_id}', 'destroy');
   });
 });

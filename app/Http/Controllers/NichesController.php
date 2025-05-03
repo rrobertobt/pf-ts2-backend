@@ -36,6 +36,13 @@ class NichesController extends Controller
         if (request()->has('is_historical')) {
             $query->where('is_historical', request()->query('is_historical'));
         }
+        // available flag
+        if (request()->has('available')) {
+          error_log('available');
+            $query->whereHas('state', function ($q) {
+                $q->where('slug', 'disponible');
+            });
+        }
 
         $perPage = request()->query('per_page', 10);
 
@@ -66,6 +73,7 @@ class NichesController extends Controller
 
     public function states()
     {
+      
         $nicheStates = NicheState::all();
         return response()->json($nicheStates);
     }

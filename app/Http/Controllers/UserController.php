@@ -53,7 +53,6 @@ class UserController extends Controller
    */
   public function store(Request $request)
   {
-    error_log(json_encode($request->all()));
     $validator = Validator::make($request->all(), [
       'first_name' => 'required|string|max:255',
       'last_name' => 'required|string|max:255',

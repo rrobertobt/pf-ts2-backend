@@ -29,12 +29,7 @@ class DatabaseSeeder extends Seeder
         'name' => 'Femenino',
         'slug' => 'femenino',
         'description' => 'Mujer',
-      ],
-      [
-        'name' => 'Prefiero no decirlo',
-        'slug' => 'prefiero-no-decirlo',
-        'description' => 'Prefiero no decirlo',
-      ],
+      ]
     ]);
 
 
