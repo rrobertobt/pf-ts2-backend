@@ -26,7 +26,7 @@ class Occupant extends Model
 
     public function gender()
     {
-        return $this->belongsTo(Gender::class);
+        return $this->belongsTo(Gender::class, 'gender_id');
     }
 
     public function currentNiche()

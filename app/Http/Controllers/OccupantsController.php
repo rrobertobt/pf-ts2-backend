@@ -49,12 +49,30 @@ class OccupantsController extends Controller
    */
   public function store(Request $request)
   {
+    $existingOccupant = Occupant::where('dpi', $request->dpi)->first();
+
+    if ($existingOccupant) {
+      $pendingOrApproved = Contract::where('occupant_id', $existingOccupant->id)
+        ->whereIn('state_id', [
+          ContractState::where('slug', 'pendiente')->first()->id,
+          ContractState::where('slug', 'aprobado')->first()->id,
+          ContractState::where('slug', 'vigente')->first()->id,
+        ])
+        ->exists();
+
+      if ($pendingOrApproved) {
+        return response()->json([
+          'message' => 'Ya existe un ocupante con el mismo DPI y tiene un contrato pendiente o aprobado',
+        ], 422);
+      }
+    }
+
     $validator = Validator::make($request->all(), [
       'first_name' => 'required|string|max:255',
       'last_name' => 'required|string|max:255',
       'date_of_birth' => 'required|date',
       'birth_location' => 'nullable|string|max:255',
-      'dpi' => 'nullable|string|max:20|unique:occupants,dpi',
+      'dpi' => 'nullable|string|max:200|unique:occupants,dpi,' . ($existingOccupant->id ?? 'null'),
       'death_date' => 'required|date',
       'death_location' => 'nullable|string|max:255',
       'death_cause' => 'nullable|string|max:255',
@@ -72,24 +90,30 @@ class OccupantsController extends Controller
     }
 
     try {
-      // before creating the occupant, check if the niche is available and set the state_id to 'ocupado'
       $niche = Niche::find($request->current_niche_id);
       if (!$niche) {
         return response()->json([
           'message' => 'Nicho no encontrado',
         ], 404);
       }
+
       if ($niche->state->slug !== 'disponible') {
         return response()->json([
           'message' => 'El nicho no está disponible',
         ], 422);
       }
+
       $niche->state_id = NicheState::where('slug', 'ocupado')->first()->id;
       $niche->save();
-    
-      $occupant = Occupant::create($request->all());
+
+      if (!$existingOccupant) {
+        $occupant = Occupant::create($request->all());
+      } else {
+        $occupant = $existingOccupant;
+      }
 
       $contractState = ContractState::where('slug', 'pendiente')->first();
+
       $contract = Contract::create([
         'start_date' => now(),
         'end_date' => now()->addYears(6),
@@ -99,12 +123,12 @@ class OccupantsController extends Controller
         'representative_user_id' => $request->representative_user_id,
         'state_id' => $contractState->id,
       ]);
-      error_log('Contract created: ' . $contract);
+
 
       return response()->json($occupant, 201);
     } catch (\Exception $e) {
       return response()->json([
-        'message' => 'Error al crear el ocupante',
+        'message' => 'Error al crear el ocupante o el contrato',
         'error' => $e->getMessage(),
       ], 500);
     }

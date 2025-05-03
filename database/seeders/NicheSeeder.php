@@ -53,12 +53,17 @@ class NicheSeeder extends Seeder
             [
                 'name' => 'Pendiente',
                 'slug' => 'pendiente',
-                'description' => 'Pendiente',
+                'description' => 'Pendiente de respuesta',
+            ],
+            [
+                'name' => 'Aprobado',
+                'slug' => 'aprobado',
+                'description' => 'Aprobado, esperando pago',
             ],
             [
                 'name' => 'Vigente',
                 'slug' => 'vigente',
-                'description' => 'Vigente',
+                'description' => 'Vigente, pago realizado',
             ],
             [
                 'name' => 'Vencido',

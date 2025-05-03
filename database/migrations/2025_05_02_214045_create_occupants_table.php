@@ -62,9 +62,16 @@ return new class extends Migration
       $table->foreignId('contract_id')->constrained('contracts')->onDelete('cascade');
       $table->text('observations')->nullable();
       $table->string('evidence_url')->nullable();
+      $table->date('generation_date')->default(now());
       $table->boolean('paid')->default(false);
-      $table->date('payment_date');
+      $table->date('payment_date')->nullable();
       $table->decimal('amount', 10, 2);
+      $table->string('correlative')->unique();
+    });
+
+    // alter contracts table to add foreign key to the current payment
+    Schema::table('contracts', function (Blueprint $table) {
+      $table->foreignId('current_payment_id')->nullable()->constrained('payments')->onDelete('cascade');
     });
   }
 
@@ -74,5 +81,9 @@ return new class extends Migration
   public function down(): void
   {
     Schema::dropIfExists('occupants');
+    Schema::dropIfExists('contract_states');
+    Schema::dropIfExists('contracts');
+    Schema::dropIfExists('representative_occupant');
+    Schema::dropIfExists('payments');
   }
 };
